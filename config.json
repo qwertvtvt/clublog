@@ -1,0 +1,7 @@
+{
+    "environment": "development",
+    "basepath": "",
+    "publicBaseUrl": "https://qwertqwert.f5.si/clublog",
+    "version": "ClubLog Server v1.0.0",
+    "port": 1234
+}
