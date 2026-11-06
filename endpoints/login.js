@@ -1,11 +1,23 @@
 const express = require("express");
 const router = express.Router();
+const rateLimit = require("express-rate-limit");
 const bcrypt = require("bcrypt");
 const knex = require("../knex.js");
 
 const DUMMY_HASH = "$2b$12$wbOryM08OJMlGyHaOMvdueTq9yoklRDqB.xATNWsmHfptojt/nP4e";
 
-router.post("/login", async function(req, res) {
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15分間
+    max: 5, // 最大5回まで
+    message: {
+        success: false,
+        message: "Too many requests. Please try again later."
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+router.post("/login", limiter, async function(req, res) {
     try {
         const { username, password } = req.body;
 
