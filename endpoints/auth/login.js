@@ -2,13 +2,13 @@ const express = require("express");
 const router = express.Router();
 const rateLimit = require("express-rate-limit");
 const bcrypt = require("bcrypt");
-const knex = require("../knex.js");
+const knex = require("../../knex.js");
 
 const DUMMY_HASH = "$2b$12$wbOryM08OJMlGyHaOMvdueTq9yoklRDqB.xATNWsmHfptojt/nP4e";
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15分間
-    max: 5, // 最大5回まで
+    windowMs: 15 * 60 * 1000,
+    max: 5,
     message: {
         success: false,
         message: "Too many requests. Please try again later."

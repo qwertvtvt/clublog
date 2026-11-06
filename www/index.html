@@ -116,19 +116,19 @@
           </label>
         </div>
         <div class="actions">
-          <button type="button" data-action="register">POST /api/register</button>
-          <button type="button" class="secondary" data-action="login">POST /api/login</button>
+          <button type="button" data-action="register">POST /api/auth/register</button>
+          <button type="button" class="secondary" data-action="login">POST /api/auth/login</button>
         </div>
       </form>
     </section>
 
     <section aria-label="API endpoints">
       <div class="endpoint">
-        <code>GET /api/me</code>
+        <code>GET /api/users/me</code>
         <button type="button" class="secondary" data-action="me">実行</button>
       </div>
       <div class="endpoint" style="margin-top: 14px">
-        <code>POST /api/logout</code>
+        <code>POST /api/auth/logout</code>
         <button type="button" class="secondary" data-action="logout">実行</button>
       </div>
       <div class="endpoint" style="margin-top: 14px">
@@ -163,10 +163,12 @@
 
       const button = document.querySelector(`[data-action="${action}"]`);
       button.disabled = true;
-      result.textContent = `${options.method} /api/${action}\n送信中...`;
+      const endpoint = action === "me" ? "/api/users/me" :
+        action === "test" ? "/api/test" : `/api/auth/${action}`;
+      result.textContent = `${options.method} ${endpoint}\n送信中...`;
 
       try {
-        const response = await fetch(`/api/${action}`, options);
+        const response = await fetch(endpoint, options);
         const body = await response.text();
         let formattedBody = body;
         try {

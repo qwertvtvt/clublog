@@ -1,4 +1,3 @@
-const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const app = express();
@@ -7,13 +6,14 @@ const bodyParser = require("body-parser");
 const cors = require('cors');
 const session = require("express-session");
 const { ConnectSessionKnexStore } = require("connect-session-knex");
-const knexConfig = require("./knexfile.js");
 const knex = require("./knex.js");
-const bcrypt = require("bcrypt");
 const config = require("./config.json");
 
 const PORT = config.port;
 const Version = config.version;
+
+const SessionSecret = process.env.SESSION_SECRET;
+if(!SessionSecret) throw new Error("SESSION_SECRET is required.");
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -30,7 +30,7 @@ const store = new ConnectSessionKnexStore({
 
 app.use(session({
     name: "connect.sid",
-    secret: process.env.SESSION_SECRET || "change-this",
+    secret: SessionSecret,
     store: store,
     resave: false,
     saveUninitialized: false,
@@ -43,13 +43,9 @@ app.use(session({
     }
 }))
 
-const endpointsPath = path.join(__dirname, "endpoints");
-fs.readdirSync(endpointsPath).filter(function(file) {
-    return path.extname(file) === ".js";
-}).forEach(function(file) {
-    const route = require(path.join(endpointsPath, file));
-    app.use("/api", route);
-});
+app.use("/api/auth", require("./endpoints/auth"));
+app.use("/api/users", require("./endpoints/users"));
+app.use("/api", require("./endpoints/test.js"));
 
 http.listen(PORT, function() {
     console.log(`${Version} started on *:${PORT}`);
