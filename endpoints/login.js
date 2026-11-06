@@ -3,6 +3,8 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const knex = require("../knex.js");
 
+const DUMMY_HASH = "$2b$12$wbOryM08OJMlGyHaOMvdueTq9yoklRDqB.xATNWsmHfptojt/nP4e";
+
 router.post("/login", async function(req, res) {
     try {
         const { username, password } = req.body;
@@ -11,6 +13,7 @@ router.post("/login", async function(req, res) {
             .where({ username })
             .first();
         if(!user) {
+            await bcrypt.compare(password, DUMMY_HASH);
             return res.status(401).json({
                 success: false,
                 message: "Username or password is incorrect"
