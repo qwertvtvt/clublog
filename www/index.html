@@ -3,186 +3,410 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>API Endpoint Tester</title>
+  <meta name="theme-color" content="#f5f7f4">
+  <title>ClubLog API テスター</title>
   <style>
     :root {
       color-scheme: light;
       font-family: "Segoe UI", "Yu Gothic UI", sans-serif;
-      background: #f3f5f2;
-      color: #202923;
+      color: #17231b;
+      background: #f5f7f4;
       font-synthesis: none;
+      --green: #256b49;
+      --green-dark: #194d34;
+      --muted: #647168;
+      --line: #dce4dd;
     }
 
     * { box-sizing: border-box; }
-
     body {
-      margin: 0;
+      min-width: 320px;
       min-height: 100vh;
-      background-image: linear-gradient(135deg, #f3f5f2 0%, #e8eee8 100%);
+      margin: 0;
+      background: radial-gradient(ellipse at 10% 0%, #e1eee5 0, transparent 38rem), #f5f7f4;
     }
 
-    main {
-      width: min(760px, 100% - 32px);
-      margin: 0 auto;
-      padding: 48px 0;
-    }
-
-    h1 { margin: 0; font-size: 28px; letter-spacing: 0; }
-    .subtitle { margin: 8px 0 30px; color: #5e6b62; }
-
-    section {
-      padding: 22px 0;
-      border-top: 1px solid #cbd4cc;
-    }
-
-    h2 { margin: 0 0 16px; font-size: 17px; }
-
-    .fields {
+    button, input, textarea { font: inherit; }
+    .shell { width: min(940px, calc(100% - 32px)); margin: 0 auto; padding: 42px 0 56px; }
+    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
+    .brand-mark {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-
-    label { display: grid; gap: 7px; color: #46534a; font-size: 14px; }
-
-    input {
-      width: 100%;
-      min-height: 42px;
-      padding: 9px 11px;
-      border: 1px solid #aebbb0;
-      border-radius: 4px;
-      background: #fff;
-      color: #202923;
-      font: inherit;
-    }
-
-    input:focus { outline: 2px solid #27724c; outline-offset: 1px; }
-
-    .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
-
-    button {
-      min-height: 40px;
-      padding: 8px 14px;
-      border: 1px solid #27724c;
-      border-radius: 4px;
-      background: #27724c;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 13px;
+      background: var(--green);
       color: #fff;
-      font: inherit;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .brand-name { font-size: 13px; font-weight: 700; letter-spacing: .05em; }
+    .brand-caption { margin-top: 3px; color: var(--muted); font-size: 12px; }
+    h1 { margin: 0; font-size: clamp(28px, 5vw, 38px); letter-spacing: -.04em; }
+    .intro { margin: 8px 0 26px; color: var(--muted); line-height: 1.7; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .card {
+      min-width: 0;
+      padding: 21px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fff;
+      box-shadow: 0 8px 26px rgb(26 55 35 / 4%);
+    }
+    .wide { grid-column: 1 / -1; }
+    .card-heading { display: flex; align-items: flex-start; gap: 11px; margin-bottom: 17px; }
+    .icon {
+      display: grid;
+      flex: 0 0 35px;
+      width: 35px;
+      height: 35px;
+      place-items: center;
+      border-radius: 10px;
+      background: #edf5ef;
+      color: var(--green-dark);
+    }
+    h2 { margin: 0; font-size: 16px; }
+    .description { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+    label { display: grid; gap: 7px; color: #435047; font-size: 13px; font-weight: 600; }
+    input, textarea {
+      width: 100%;
+      min-height: 41px;
+      padding: 9px 11px;
+      border: 1px solid #cbd6cd;
+      border-radius: 8px;
+      outline: none;
+      background: #fff;
+      color: #17231b;
+      font-size: 14px;
+      font-weight: 400;
+    }
+    textarea { min-height: 76px; resize: vertical; }
+    input:focus, textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgb(37 107 73 / 12%); }
+    input::placeholder, textarea::placeholder { color: #9aa69d; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    button {
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1px solid var(--green);
+      border-radius: 8px;
+      background: var(--green);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 650;
       cursor: pointer;
     }
-
-    button.secondary { background: transparent; color: #245c3e; }
-    button:hover { filter: brightness(.94); }
-    button:disabled { cursor: wait; opacity: .6; }
-
-    .endpoint { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    .endpoint code { color: #56665a; font-size: 14px; }
-
-    #result {
-      min-height: 120px;
+    button:hover { border-color: var(--green-dark); background: var(--green-dark); }
+    button.secondary { background: #fff; color: var(--green-dark); }
+    button.secondary:hover { background: #eff6f0; }
+    button.danger { border-color: #b94141; background: #fff; color: #a52e2e; }
+    button.danger:hover { background: #fff1f0; }
+    button:disabled { cursor: wait; opacity: .58; }
+    button:focus-visible { outline: 3px solid rgb(37 107 73 / 30%); outline-offset: 2px; }
+    .endpoint-list { display: grid; gap: 9px; }
+    .endpoint-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 11px;
+      border: 1px solid #e6ece7;
+      border-radius: 9px;
+      background: #fbfcfb;
+    }
+    .endpoint-info { min-width: 0; }
+    .endpoint-title { margin-bottom: 3px; font-size: 13px; font-weight: 650; }
+    code { color: #68766d; font: 12px/1.5 Consolas, monospace; overflow-wrap: anywhere; }
+    .endpoint-row button { flex: 0 0 auto; }
+    .response { margin-top: 16px; padding: 0; overflow: hidden; }
+    .response-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 19px;
+      border-bottom: 1px solid var(--line);
+    }
+    .response-heading { display: flex; align-items: center; gap: 10px; }
+    #response-meta { color: var(--muted); font-size: 12px; text-align: right; }
+    #response {
+      min-height: 145px;
+      max-height: 400px;
       margin: 0;
-      padding: 16px;
+      padding: 17px 19px;
       overflow: auto;
-      border: 1px solid #35443a;
-      border-radius: 4px;
       background: #17231b;
-      color: #e0eee4;
-      font: 13px/1.6 Consolas, monospace;
+      color: #dcebe0;
+      font: 12px/1.65 Consolas, "Yu Gothic UI", monospace;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
     }
-
-    @media (max-width: 560px) {
-      main { padding: 30px 0; }
+    .note { margin: 12px 2px 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    @media (max-width: 640px) {
+      .shell { padding-top: 28px; }
+      .grid { grid-template-columns: 1fr; }
+      .wide { grid-column: auto; }
+    }
+    @media (max-width: 460px) {
+      .shell { width: calc(100% - 24px); }
+      .card { padding: 17px; }
       .fields { grid-template-columns: 1fr; }
-      .endpoint { align-items: flex-start; }
+      .response-header, #response { padding-inline: 16px; }
     }
   </style>
 </head>
 <body>
-  <main>
-    <h1>API Endpoint Tester</h1>
-    <p class="subtitle">Clublog API の応答とログインセッションを確認します。</p>
+  <main class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">C</div>
+        <div>
+          <div class="brand-name">CLUBLOG DEVELOPER TOOLS</div>
+          <div class="brand-caption">API テストコンソール</div>
+        </div>
+      </div>
+      <h1>グループ API テスター</h1>
+      <p class="intro">アカウントでログインし、グループ作成・招待コード発行・参加・退出をテストできます。ログインセッションはブラウザーで保持されます。</p>
+    </header>
 
-    <section aria-labelledby="auth-title">
-      <h2 id="auth-title">ユーザー認証</h2>
-      <form id="credentials-form">
+    <div class="grid">
+      <section class="card" aria-labelledby="auth-title">
+        <div class="card-heading">
+          <span class="icon" aria-hidden="true">♙</span>
+          <div>
+            <h2 id="auth-title">アカウント</h2>
+            <p class="description">グループ操作にはログインが必要です。</p>
+          </div>
+        </div>
         <div class="fields">
-          <label>ユーザー名
-            <input id="username" name="username" autocomplete="username" required>
+          <label for="username">ユーザー名
+            <input id="username" autocomplete="username" placeholder="ユーザー名">
           </label>
-          <label>パスワード
-            <input id="password" name="password" type="password" autocomplete="current-password" required>
+          <label for="password">パスワード
+            <input id="password" type="password" autocomplete="current-password" placeholder="パスワード">
           </label>
         </div>
         <div class="actions">
           <button type="button" data-action="register">POST /api/auth/register</button>
           <button type="button" class="secondary" data-action="login">POST /api/auth/login</button>
         </div>
-      </form>
-    </section>
+      </section>
 
-    <section aria-label="API endpoints">
-      <div class="endpoint">
-        <code>GET /api/users/me</code>
-        <button type="button" class="secondary" data-action="me">実行</button>
-      </div>
-      <div class="endpoint" style="margin-top: 14px">
-        <code>POST /api/auth/logout</code>
-        <button type="button" class="secondary" data-action="logout">実行</button>
-      </div>
-      <div class="endpoint" style="margin-top: 14px">
-        <code>GET /api/test</code>
-        <button type="button" class="secondary" data-action="test">実行</button>
-      </div>
-    </section>
+      <section class="card" aria-labelledby="session-title">
+        <div class="card-heading">
+          <span class="icon" aria-hidden="true">↔</span>
+          <div>
+            <h2 id="session-title">セッション</h2>
+            <p class="description">ログイン状態を確認、またはログアウトします。</p>
+          </div>
+        </div>
+        <div class="endpoint-list">
+          <div class="endpoint-row">
+            <div class="endpoint-info">
+              <div class="endpoint-title">ログインユーザー</div>
+              <code>GET /api/users/me</code>
+            </div>
+            <button type="button" class="secondary" data-action="me">実行</button>
+          </div>
+          <div class="endpoint-row">
+            <div class="endpoint-info">
+              <div class="endpoint-title">ログアウト</div>
+              <code>POST /api/auth/logout</code>
+            </div>
+            <button type="button" class="secondary" data-action="logout">実行</button>
+          </div>
+          <div class="endpoint-row">
+            <div class="endpoint-info">
+              <div class="endpoint-title">ヘルスチェック</div>
+              <code>GET /api/test</code>
+            </div>
+            <button type="button" class="secondary" data-action="test">実行</button>
+          </div>
+        </div>
+      </section>
 
-    <section aria-labelledby="result-title">
-      <h2 id="result-title">レスポンス</h2>
-      <pre id="result" aria-live="polite">実行結果がここに表示されます。</pre>
+      <section class="card wide" aria-labelledby="groups-title">
+        <div class="card-heading">
+          <span class="icon" aria-hidden="true">♧</span>
+          <div>
+            <h2 id="groups-title">グループ操作</h2>
+            <p class="description">グループ一覧、メンバー一覧、作成、招待コード発行・参加、退出をテストできます。</p>
+          </div>
+        </div>
+        <div class="fields">
+          <label for="group-name">グループ名
+            <input id="group-name" placeholder="例: バスケットボール部">
+          </label>
+          <label for="group-id">グループID
+            <input id="group-id" inputmode="numeric" placeholder="作成後に自動入力">
+          </label>
+          <label for="invite-code">招待コード
+            <input id="invite-code" autocomplete="off" placeholder="発行後に自動入力">
+          </label>
+          <label for="group-description">説明（任意）
+            <input id="group-description" placeholder="グループの説明">
+          </label>
+        </div>
+        <div class="actions">
+          <button type="button" class="secondary" data-action="group-list">GET /api/groups</button>
+          <button type="button" class="secondary" data-action="group-members">GET /api/groups/members/:groupid</button>
+          <button type="button" data-action="group-create">POST /api/groups/create</button>
+          <button type="button" class="secondary" data-action="group-invite">GET /api/groups/invite/:groupid</button>
+          <button type="button" class="secondary" data-action="group-join">GET /api/groups/join/:code</button>
+          <button type="button" class="danger" data-action="group-leave">POST /api/groups/leave/:groupid</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="card response" aria-labelledby="response-title">
+      <div class="response-header">
+        <div class="response-heading">
+          <span class="icon" aria-hidden="true">⌘</span>
+          <h2 id="response-title">リクエスト / レスポンス</h2>
+        </div>
+        <span id="response-meta" aria-live="polite">待機中</span>
+      </div>
+      <pre id="response" aria-live="polite">APIを実行すると、リクエストとレスポンスの詳細がここに表示されます。</pre>
     </section>
+    <p class="note">作成・参加・退出はデータベースを変更します。作成者権限の操作を試すには、作成したアカウントでログインしてください。</p>
   </main>
 
   <script>
-    const result = document.querySelector("#result");
-    const credentialsForm = document.querySelector("#credentials-form");
+    const responseOutput = document.querySelector("#response");
+    const responseMeta = document.querySelector("#response-meta");
+    const actionButtons = [...document.querySelectorAll("[data-action]")];
+
+    function showValidationMessage(message) {
+      responseMeta.textContent = "入力を確認してください";
+      responseOutput.textContent = message;
+    }
 
     async function callEndpoint(action) {
-      const username = document.querySelector("#username").value;
+      const username = document.querySelector("#username").value.trim();
       const password = document.querySelector("#password").value;
-      const options = { method: "GET", credentials: "same-origin" };
+      const groupId = document.querySelector("#group-id").value.trim();
+      const inviteCode = document.querySelector("#invite-code").value.trim();
+      let method = "GET";
+      let endpoint;
+      let body;
 
       if (action === "register" || action === "login") {
-        if (!credentialsForm.reportValidity()) return;
-        options.method = "POST";
-        options.headers = { "Content-Type": "application/json" };
-        options.body = JSON.stringify({ username, password });
+        if (!username || !password) {
+          showValidationMessage("ユーザー名とパスワードを入力してください。");
+          return;
+        }
+        method = "POST";
+        endpoint = `/api/auth/${action}`;
+        body = { username, password };
+      } else if (action === "me") {
+        endpoint = "/api/users/me";
       } else if (action === "logout") {
-        options.method = "POST";
+        method = "POST";
+        endpoint = "/api/auth/logout";
+      } else if (action === "test") {
+        endpoint = "/api/test";
+      } else if (action === "group-list") {
+        endpoint = "/api/groups";
+      } else if (action === "group-members") {
+        if (!groupId) {
+          showValidationMessage("メンバー一覧を表示するグループIDを入力してください。");
+          return;
+        }
+        endpoint = `/api/groups/members/${encodeURIComponent(groupId)}`;
+      } else if (action === "group-create") {
+        const groupname = document.querySelector("#group-name").value.trim();
+        if (!groupname) {
+          showValidationMessage("グループ名を入力してください。");
+          return;
+        }
+        method = "POST";
+        endpoint = "/api/groups/create";
+        body = {
+          groupname,
+          description: document.querySelector("#group-description").value.trim()
+        };
+      } else if (action === "group-invite") {
+        if (!groupId) {
+          showValidationMessage("招待コードを発行するグループIDを入力してください。");
+          return;
+        }
+        endpoint = `/api/groups/invite/${encodeURIComponent(groupId)}`;
+      } else if (action === "group-join") {
+        if (!inviteCode) {
+          showValidationMessage("招待コードを入力してください。");
+          return;
+        }
+        endpoint = `/api/groups/join/${encodeURIComponent(inviteCode)}`;
+      } else if (action === "group-leave") {
+        if (!groupId) {
+          showValidationMessage("退出するグループIDを入力してください。");
+          return;
+        }
+        method = "POST";
+        endpoint = `/api/groups/leave/${encodeURIComponent(groupId)}`;
       }
 
-      const button = document.querySelector(`[data-action="${action}"]`);
-      button.disabled = true;
-      const endpoint = action === "me" ? "/api/users/me" :
-        action === "test" ? "/api/test" : `/api/auth/${action}`;
-      result.textContent = `${options.method} ${endpoint}\n送信中...`;
+      actionButtons.forEach((button) => { button.disabled = true; });
+      responseMeta.textContent = "送信中...";
+      responseOutput.textContent = `${method} ${endpoint}\n\n${body ? `Request body:\n${JSON.stringify(body, null, 2)}\n\n` : ""}レスポンスを待っています...`;
+      const startedAt = performance.now();
 
       try {
-        const response = await fetch(endpoint, options);
-        const body = await response.text();
-        let formattedBody = body;
-        try {
-          formattedBody = JSON.stringify(JSON.parse(body), null, 2);
-        } catch {}
-        result.textContent = `HTTP ${response.status} ${response.statusText}\n\n${formattedBody || "(empty response)"}`;
+        const response = await fetch(endpoint, {
+          method,
+          credentials: "same-origin",
+          headers: body ? { "Content-Type": "application/json" } : undefined,
+          body: body ? JSON.stringify(body) : undefined
+        });
+        const text = await response.text();
+        let responseBody = text || "(empty response)";
+        if (text) {
+          try {
+            responseBody = JSON.stringify(JSON.parse(text), null, 2);
+          } catch {
+            responseBody = text;
+          }
+        }
+
+        const elapsed = Math.round(performance.now() - startedAt);
+        responseMeta.textContent = `HTTP ${response.status} · ${elapsed} ms`;
+        responseOutput.textContent = [
+          `${method} ${endpoint}`,
+          `HTTP ${response.status} ${response.statusText}`,
+          `Duration: ${elapsed} ms`,
+          "",
+          "Response headers:",
+          [...response.headers].map(([name, value]) => `${name}: ${value}`).join("\n") || "(none)",
+          "",
+          "Response body:",
+          responseBody
+        ].join("\n");
+
+        if (response.ok && responseBody !== "(empty response)") {
+          try {
+            const data = JSON.parse(text);
+            if (action === "group-create" && data.groupid !== undefined) {
+              document.querySelector("#group-id").value = data.groupid;
+            }
+            if (action === "group-invite" && data.code) {
+              document.querySelector("#invite-code").value = data.code;
+            }
+            if (action === "group-join" && data.groupid !== undefined) {
+              document.querySelector("#group-id").value = data.groupid;
+            }
+          } catch (error) {
+            responseMeta.textContent += " · レスポンス解析失敗";
+          }
+        }
       } catch (error) {
-        result.textContent = `リクエストに失敗しました\n${error.message}`;
+        responseMeta.textContent = "通信エラー";
+        responseOutput.textContent = `${method} ${endpoint}\n\nリクエストに失敗しました。\n${error.message}`;
       } finally {
-        button.disabled = false;
+        actionButtons.forEach((button) => { button.disabled = false; });
       }
     }
 
-    document.querySelectorAll("[data-action]").forEach((button) => {
+    actionButtons.forEach((button) => {
       button.addEventListener("click", () => callEndpoint(button.dataset.action));
     });
   </script>

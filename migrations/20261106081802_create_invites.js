@@ -4,7 +4,7 @@
  */
 exports.up = function(knex) {
   return knex.schema.createTable("invites", function(table) {
-    table.integer("code").primary();
+    table.string("code").primary();
     table.integer("groupid").notNullable();
     table.bigInteger("age").defaultTo(null);
     table.boolean("revoked").defaultTo(false);

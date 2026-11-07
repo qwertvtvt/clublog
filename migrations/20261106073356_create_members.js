@@ -4,9 +4,11 @@
  */
 exports.up = function(knex) {
   return knex.schema.createTable("members", function(table) {
-    table.integer("userid").primary();
-    table.integer("groupid").primary();
+    table.integer("userid").notNullable();
+    table.integer("groupid").notNullable();
     table.bigInteger("joined_at").notNullable();
+
+    table.primary(["userid", "groupid"]);
   });
 };
 
