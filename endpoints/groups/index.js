@@ -12,10 +12,12 @@ router.get("/", auth, async function(req, res) {
             .select(
                 "groups.groupid",
                 "groups.groupname",
+                "groups.description",
                 "members.joined_at",
                 knex.raw("(groups.authorid = ?) as author", [userid])
             )
             .where({ userid })
+            .orderBy("author", "desc")
             .orderBy("joined_at", "asc");
         
         res.json(groups);
