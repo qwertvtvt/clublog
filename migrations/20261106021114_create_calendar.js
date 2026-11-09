@@ -5,6 +5,7 @@
 exports.up = function(knex) {
   return knex.schema.createTable("calendar", function(table) {
     table.increments("eventid").primary();
+    table.integer("groupid").notNullable();
     table.string("title").notNullable();
     table.bigInteger("timestamp").notNullable();
     table.string("location");
