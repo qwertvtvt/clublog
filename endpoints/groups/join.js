@@ -3,7 +3,7 @@ const router = express.Router();
 const knex = require("../../knex.js");
 const auth = require("../../middleware/auth.js");
 
-router.get("/join/:code", auth, async function(req, res) {
+router.post("/join/:code", auth, async function(req, res) {
     try {
         const inviteCode = req.params.code;
         const userid = req.session.userId;

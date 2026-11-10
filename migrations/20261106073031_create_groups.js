@@ -5,7 +5,7 @@
 exports.up = function(knex) {
   return knex.schema.createTable("groups", function(table) {
     table.increments("groupid").primary();
-    table.string("groupname").notNullable();
+    table.string("groupname").notNullable().unique();
     table.integer("authorid").notNullable();
     table.string("description");
   });

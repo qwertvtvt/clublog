@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const knex = require("../../knex.js");
 const auth = require("../../middleware/auth.js");
 
-router.get("/invite/:groupid", auth, async function(req, res) {
+router.post("/invite/:groupid", auth, async function(req, res) {
     try {
         const { groupid } = req.params;
         const requestedUserId = req.session.userId;

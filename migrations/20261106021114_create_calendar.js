@@ -10,6 +10,7 @@ exports.up = function(knex) {
     table.bigInteger("timestamp").notNullable();
     table.string("location");
     table.text("description");
+    table.bigInteger("created_at").notNullable();
   });
 };
 

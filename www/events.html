@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7f4">
+  <title>ClubLog カレンダー API テスター</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Segoe UI", "Yu Gothic UI", sans-serif;
+      color: #17231b;
+      background: #f5f7f4;
+      font-synthesis: none;
+      --green: #256b49;
+      --green-dark: #194d34;
+      --muted: #647168;
+      --line: #dce4dd;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background: radial-gradient(ellipse at 10% 0%, #e1eee5 0, transparent 38rem), #f5f7f4;
+    }
+
+    button, input, textarea { font: inherit; }
+    .shell { width: min(940px, calc(100% - 32px)); margin: 0 auto; padding: 42px 0 56px; }
+    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
+    .brand-mark {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 13px;
+      background: var(--green);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .brand-name { font-size: 13px; font-weight: 700; letter-spacing: .05em; }
+    .brand-caption { margin-top: 3px; color: var(--muted); font-size: 12px; }
+    h1 { margin: 0; font-size: clamp(28px, 5vw, 38px); letter-spacing: -.04em; }
+    .intro { margin: 8px 0 26px; color: var(--muted); line-height: 1.7; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .card {
+      min-width: 0;
+      padding: 21px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fff;
+      box-shadow: 0 8px 26px rgb(26 55 35 / 4%);
+    }
+    .wide { grid-column: 1 / -1; }
+    .card-heading { display: flex; align-items: flex-start; gap: 11px; margin-bottom: 17px; }
+    .icon {
+      display: grid;
+      flex: 0 0 35px;
+      width: 35px;
+      height: 35px;
+      place-items: center;
+      border-radius: 10px;
+      background: #edf5ef;
+      color: var(--green-dark);
+    }
+    h2 { margin: 0; font-size: 16px; }
+    .description { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+    label { display: grid; gap: 7px; color: #435047; font-size: 13px; font-weight: 600; }
+    input, textarea {
+      width: 100%;
+      min-height: 41px;
+      padding: 9px 11px;
+      border: 1px solid #cbd6cd;
+      border-radius: 8px;
+      outline: none;
+      background: #fff;
+      color: #17231b;
+      font-size: 14px;
+      font-weight: 400;
+    }
+    textarea { min-height: 76px; resize: vertical; }
+    input:focus, textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgb(37 107 73 / 12%); }
+    input::placeholder, textarea::placeholder { color: #9aa69d; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    button {
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1px solid var(--green);
+      border-radius: 8px;
+      background: var(--green);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    button:hover { border-color: var(--green-dark); background: var(--green-dark); }
+    button.secondary { background: #fff; color: var(--green-dark); }
+    button.secondary:hover { background: #eff6f0; }
+    button.danger { border-color: #b94141; background: #fff; color: #a52e2e; }
+    button.danger:hover { background: #fff1f0; }
+    button:disabled { cursor: wait; opacity: .58; }
+    button:focus-visible { outline: 3px solid rgb(37 107 73 / 30%); outline-offset: 2px; }
+    .response { margin-top: 16px; padding: 0; overflow: hidden; }
+    .response-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 19px;
+      border-bottom: 1px solid var(--line);
+    }
+    .response-heading { display: flex; align-items: center; gap: 10px; }
+    #response-meta { color: var(--muted); font-size: 12px; text-align: right; }
+    #response {
+      min-height: 150px;
+      max-height: 420px;
+      margin: 0;
+      padding: 17px 19px;
+      overflow: auto;
+      background: #17231b;
+      color: #dcebe0;
+      font: 12px/1.65 Consolas, "Yu Gothic UI", monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .note { margin: 12px 2px 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    @media (max-width: 640px) {
+      .shell { padding-top: 28px; }
+      .grid { grid-template-columns: 1fr; }
+      .wide { grid-column: auto; }
+    }
+    @media (max-width: 460px) {
+      .shell { width: calc(100% - 24px); }
+      .card { padding: 17px; }
+      .fields { grid-template-columns: 1fr; }
+      .response-header, #response { padding-inline: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">C</div>
+        <div>
+          <div class="brand-name">CLUBLOG DEVELOPER TOOLS</div>
+          <div class="brand-caption">カレンダー API テストコンソール</div>
+        </div>
+      </div>
+      <h1>カレンダー API テスター</h1>
+      <p class="intro">グループの予定を作成・取得・更新・削除します。ログインセッションはブラウザーで保持されます。</p>
+    </header>
+
+    <div class="grid">
+      <section class="card" aria-labelledby="auth-title">
+        <div class="card-heading">
+          <span class="icon" aria-hidden="true">♙</span>
+          <div>
+            <h2 id="auth-title">アカウント</h2>
+            <p class="description">予定の操作にはログインが必要です。</p>
+          </div>
+        </div>
+        <div class="fields">
+          <label for="username">ユーザー名
+            <input id="username" autocomplete="username" placeholder="ユーザー名">
+          </label>
+          <label for="password">パスワード
+            <input id="password" type="password" autocomplete="current-password" placeholder="パスワード">
+          </label>
+        </div>
+        <div class="actions">
+          <button type="button" data-action="register">POST /api/auth/register</button>
+          <button type="button" class="secondary" data-action="login">POST /api/auth/login</button>
+          <button type="button" class="secondary" data-action="me">GET /api/users/me</button>
+          <button type="button" class="secondary" data-action="logout">POST /api/auth/logout</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="scope-title">
+        <div class="card-heading">
+          <span class="icon" aria-hidden="true">▦</span>
+          <div>
+            <h2 id="scope-title">グループ・検索条件</h2>
+            <p class="description">一覧の年・月は任意です。空欄のまま実行して現在のAPIの挙動も確認できます。</p>
+          </div>
+        </div>
+        <div class="fields">
+          <label for="group-id">グループID
+            <input id="group-id" inputmode="numeric" placeholder="対象グループ">
+          </label>
+          <label for="event-id">イベントID
+            <input id="event-id" inputmode="numeric" placeholder="取得・更新・削除対象">
+          </label>
+          <label for="year">年（一覧用・任意）
+            <input id="year" type="text" inputmode="numeric" placeholder="例: 2026">
+          </label>
+          <label for="month">月（一覧用・任意）
+            <input id="month" type="text" inputmode="numeric" placeholder="1〜12">
+          </label>
+        </div>
+        <div class="actions">
+          <button type="button" class="secondary" data-action="event-list">GET /api/groups/:groupid/events</button>
+        </div>
+      </section>
+
+      <section class="card wide" aria-labelledby="event-title-heading">
+        <div class="card-heading">
+          <span class="icon" aria-hidden="true">✎</span>
+          <div>
+            <h2 id="event-title-heading">予定の内容</h2>
+            <p class="description">作成・更新ではタイトルと日時を入力します。日時はミリ秒のUnix timestampに変換して送信します。</p>
+          </div>
+        </div>
+        <div class="fields">
+          <label for="title">タイトル
+            <input id="title" placeholder="例: 練習試合">
+          </label>
+          <label for="timestamp">日時
+            <input id="timestamp" type="datetime-local">
+          </label>
+          <label for="location">場所（任意）
+            <input id="location" placeholder="例: 第一体育館">
+          </label>
+          <label for="description">説明（任意）
+            <textarea id="description" placeholder="予定の説明"></textarea>
+          </label>
+        </div>
+        <div class="actions">
+          <button type="button" data-action="event-create">POST /api/groups/:groupid/events</button>
+          <button type="button" class="secondary" data-action="event-detail">GET /api/groups/:groupid/events/:eventid</button>
+          <button type="button" class="secondary" data-action="event-update">PUT /api/groups/:groupid/events/:eventid</button>
+          <button type="button" class="danger" data-action="event-delete">DELETE /api/groups/:groupid/events/:eventid</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="card response" aria-labelledby="response-title">
+      <div class="response-header">
+        <div class="response-heading">
+          <span class="icon" aria-hidden="true">⌘</span>
+          <h2 id="response-title">リクエスト / レスポンス</h2>
+        </div>
+        <span id="response-meta" aria-live="polite">待機中</span>
+      </div>
+      <pre id="response" aria-live="polite">APIを実行すると、リクエストとレスポンスの詳細がここに表示されます。</pre>
+    </section>
+    <p class="note">作成・更新・削除は実際のデータベースを変更します。作成・更新・削除はグループ作成者のみ実行できます。</p>
+  </main>
+
+  <script>
+    const responseOutput = document.querySelector("#response");
+    const responseMeta = document.querySelector("#response-meta");
+    const actionButtons = [...document.querySelectorAll("[data-action]")];
+
+    function showValidationMessage(message) {
+      responseMeta.textContent = "入力を確認してください";
+      responseOutput.textContent = message;
+    }
+
+    function getEventBody() {
+      const dateValue = document.querySelector("#timestamp").value;
+      const timestamp = new Date(dateValue).getTime();
+      if (!dateValue || !Number.isFinite(timestamp)) {
+        showValidationMessage("有効な日時を入力してください。");
+        return null;
+      }
+
+      const title = document.querySelector("#title").value.trim();
+      if (!title) {
+        showValidationMessage("タイトルを入力してください。");
+        return null;
+      }
+
+      return {
+        title,
+        timestamp,
+        location: document.querySelector("#location").value,
+        description: document.querySelector("#description").value
+      };
+    }
+
+    async function callEndpoint(action) {
+      const groupId = document.querySelector("#group-id").value.trim();
+      const eventId = document.querySelector("#event-id").value.trim();
+      const username = document.querySelector("#username").value.trim();
+      const password = document.querySelector("#password").value;
+      let method = "GET";
+      let endpoint;
+      let body;
+
+      if (action === "register" || action === "login") {
+        if (!username || !password) {
+          showValidationMessage("ユーザー名とパスワードを入力してください。");
+          return;
+        }
+        method = "POST";
+        endpoint = `/api/auth/${action}`;
+        body = { username, password };
+      } else if (action === "me") {
+        endpoint = "/api/users/me";
+      } else if (action === "logout") {
+        method = "POST";
+        endpoint = "/api/auth/logout";
+      } else if (action.startsWith("event-")) {
+        if (!groupId) {
+          showValidationMessage("グループIDを入力してください。");
+          return;
+        }
+
+        const eventAction = action.slice("event-".length);
+        const basePath = `/api/groups/${encodeURIComponent(groupId)}/events`;
+        if (eventAction === "list") {
+          endpoint = basePath;
+          const query = new URLSearchParams();
+          const year = document.querySelector("#year").value.trim();
+          const month = document.querySelector("#month").value.trim();
+          if (year) query.set("year", year);
+          if (month) query.set("month", month);
+          const queryString = query.toString();
+          if (queryString) endpoint += `?${queryString}`;
+        } else {
+          if (!eventId && eventAction !== "create") {
+            showValidationMessage("イベントIDを入力してください。");
+            return;
+          }
+          if (eventAction === "create") {
+            method = "POST";
+            endpoint = basePath;
+          } else {
+            endpoint = `${basePath}/${encodeURIComponent(eventId)}`;
+            if (eventAction === "update") method = "PUT";
+            if (eventAction === "delete") method = "DELETE";
+          }
+          if (eventAction === "create" || eventAction === "update") {
+            body = getEventBody();
+            if (!body) return;
+          }
+        }
+      }
+
+      actionButtons.forEach((button) => { button.disabled = true; });
+      responseMeta.textContent = "送信中...";
+      responseOutput.textContent = `${method} ${endpoint}\n\n${body ? `Request body:\n${JSON.stringify(body, null, 2)}\n\n` : ""}レスポンスを待っています...`;
+      const startedAt = performance.now();
+
+      try {
+        const response = await fetch(endpoint, {
+          method,
+          credentials: "same-origin",
+          headers: body ? { "Content-Type": "application/json" } : undefined,
+          body: body ? JSON.stringify(body) : undefined
+        });
+        const text = await response.text();
+        let responseBody = text || "(empty response)";
+        if (text) {
+          try {
+            responseBody = JSON.stringify(JSON.parse(text), null, 2);
+          } catch {
+            responseBody = text;
+          }
+        }
+
+        const elapsed = Math.round(performance.now() - startedAt);
+        responseMeta.textContent = `HTTP ${response.status} · ${elapsed} ms`;
+        responseOutput.textContent = [
+          `${method} ${endpoint}`,
+          `HTTP ${response.status} ${response.statusText}`,
+          `Duration: ${elapsed} ms`,
+          "",
+          "Response headers:",
+          [...response.headers].map(([name, value]) => `${name}: ${value}`).join("\n") || "(none)",
+          "",
+          "Response body:",
+          responseBody
+        ].join("\n");
+
+        if (response.ok && text) {
+          try {
+            const data = JSON.parse(text);
+            if (action === "event-create" && data.eventid !== undefined) {
+              document.querySelector("#event-id").value = data.eventid;
+            }
+          } catch {
+            responseMeta.textContent += " · JSON以外のレスポンス";
+          }
+        }
+      } catch (error) {
+        responseMeta.textContent = "通信エラー";
+        responseOutput.textContent = `${method} ${endpoint}\n\nリクエストに失敗しました。\n${error.message}`;
+      } finally {
+        actionButtons.forEach((button) => { button.disabled = false; });
+      }
+    }
+
+    actionButtons.forEach((button) => {
+      button.addEventListener("click", () => callEndpoint(button.dataset.action));
+    });
+  </script>
+</body>
+</html>

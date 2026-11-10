@@ -32,8 +32,18 @@ router.put("/:groupid/events/:eventid", auth, async function(req, res) {
                 message: "title and timestamp are required"
             });
         }
+        if(
+            typeof timestamp !== "number" ||
+            !Number.isSafeInteger(timestamp) ||
+            !Number.isFinite(new Date(timestamp).getTime())
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "timestamp must be a valid millisecond timestamp"
+            });
+        }
 
-        const affected = await knex("calendar")
+        const updated = await knex("calendar")
             .where({ groupid, eventid })
             .update({
                 title,
@@ -42,7 +52,7 @@ router.put("/:groupid/events/:eventid", auth, async function(req, res) {
                 description
             });
         
-        if(affected == 0) {
+        if(updated == 0) {
             return res.status(404).json({
                 success: false,
                 message: "eventid doesnt exist"

@@ -32,13 +32,25 @@ router.post("/:groupid/events", auth, async function(req, res) {
                 message: "title and timestamp are required"
             });
         }
+        if(
+            typeof timestamp !== "number" ||
+            !Number.isSafeInteger(timestamp) ||
+            !Number.isFinite(new Date(timestamp).getTime())
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "timestamp must be a valid millisecond timestamp"
+            });
+        }
 
+        const now = Date.now();
         const [ eventid ] = await knex("calendar").insert({
             groupid: Number(groupid),
             title: title,
             timestamp: Number(timestamp),
             location: location,
-            description: description
+            description: description,
+            created_at: now
         });
 
         res.status(201).json({
