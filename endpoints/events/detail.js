@@ -21,7 +21,7 @@ router.get("/:groupid/events/:eventid", auth, async function(req, res) {
 
         const event = await knex("calendar")
             .select("eventid", "title", "timestamp", "location", "description")
-            .where({ eventid })
+            .where({ groupid, eventid })
             .first();
         if(!event) {
             return res.status(404).json({

@@ -47,6 +47,7 @@ app.use(session({
 app.use("/api/auth", require("./endpoints/auth"));
 app.use("/api/users", require("./endpoints/users"));
 app.use("/api/groups", require("./endpoints/groups"));
+app.use("/api/groups", require("./endpoints/events"));
 app.use("/api", require("./endpoints/test.js"));
 
 http.listen(PORT, function() {
