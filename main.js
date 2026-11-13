@@ -44,11 +44,12 @@ app.use(session({
     }
 }))
 
+app.use("/api", require("./endpoints/test.js"));
 app.use("/api/auth", require("./endpoints/auth"));
 app.use("/api/users", require("./endpoints/users"));
 app.use("/api/groups", require("./endpoints/groups"));
 app.use("/api/groups", require("./endpoints/events"));
-app.use("/api", require("./endpoints/test.js"));
+app.use("/api/groups", require("./endpoints/notices"));
 
 http.listen(PORT, function() {
     console.log(`${Version} started on *:${PORT}`);
