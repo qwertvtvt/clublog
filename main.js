@@ -16,7 +16,10 @@ const Version = config.version;
 const SessionSecret = process.env.SESSION_SECRET;
 if(!SessionSecret) throw new Error("SESSION_SECRET is required.");
 
-app.use(cors());
+app.use(cors({
+    origin: true,
+    credentials: true
+}));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use("/", express.static(path.join(__dirname, "www")));
@@ -42,7 +45,7 @@ app.use(session({
         sameSite: "lax",
         maxAge: 1000 * 60 * 60 * 24
     }
-}))
+}));
 
 app.use("/api", require("./endpoints/test.js"));
 app.use("/api/auth", require("./endpoints/auth"));
